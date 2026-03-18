@@ -57,7 +57,7 @@ struct PDFReaderApp: App {
                 Divider()
 
                 Button("Close Document") {
-                    documentManager.closeDocument()
+                    documentManager.closeDocumentRequested()
                 }
                 .keyboardShortcut("w", modifiers: .command)
                 .disabled(documentManager.pdfDocument == nil)

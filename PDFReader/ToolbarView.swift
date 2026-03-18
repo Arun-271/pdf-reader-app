@@ -180,7 +180,7 @@ struct ToolbarView: View {
                 Divider()
 
                 // Color options
-                ForEach(highlighterColors, id: \.1) { name, color in
+                ForEach(highlighterColors, id: \.0) { name, color in
                     Button(action: {
                         documentManager.highlighterColor = color
                         documentManager.highlighterEnabled = true
@@ -254,6 +254,29 @@ struct ToolbarView: View {
             }
             .buttonStyle(.borderless)
             .help("Toggle Bookmark (⌘D)")
+            .disabled(!hasDocument)
+            
+            Divider()
+                .frame(height: 20)
+                
+            // Auto Save toggle
+            Button(action: {
+                documentManager.autoSaveEnabled.toggle()
+                if documentManager.autoSaveEnabled && documentManager.hasUnsavedChanges {
+                    documentManager.saveDocument()
+                }
+            }) {
+                HStack(spacing: 4) {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                    if documentManager.autoSaveEnabled {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 10))
+                    }
+                }
+                .foregroundColor(documentManager.autoSaveEnabled ? .green : .secondary)
+            }
+            .buttonStyle(.borderless)
+            .help("Toggle Auto Save")
             .disabled(!hasDocument)
             
             // Print button

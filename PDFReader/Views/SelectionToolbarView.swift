@@ -188,7 +188,8 @@ class SelectionToolbarController: NSObject, ObservableObject {
         // Send to AI assistant
         documentManager?.rightPanelMode = .ai
         documentManager?.showRightPanel = true
-        // Could also set the text as a query
+        // Post notification to paste text
+        NotificationCenter.default.post(name: NSNotification.Name("AskAIPasteText"), object: selectedText)
         hide()
     }
     

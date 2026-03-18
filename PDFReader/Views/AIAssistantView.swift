@@ -147,6 +147,15 @@ struct AIAssistantView: View {
             AISettingsView()
                 .environmentObject(aiManager)
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("AskAIPasteText"))) { notification in
+            if let text = notification.object as? String {
+                inputText = text
+                // Optional: slight delay to ensure the view draws before focusing
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    isInputFocused = true
+                }
+            }
+        }
     }
     
     private func sendMessage(_ text: String) {

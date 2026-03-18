@@ -55,6 +55,11 @@ class DocumentManager: ObservableObject {
     @Published var addNoteMode: Bool = false
     @Published var noteColor: NSColor = .systemYellow
     
+    // Save state
+    @Published var hasUnsavedChanges: Bool = false
+    @Published var showSavePrompt: Bool = false
+    @Published var autoSaveEnabled: Bool = false
+    
     var pdfView: PDFView?
     
     var pageCount: Int {
@@ -89,17 +94,43 @@ class DocumentManager: ObservableObject {
             self.scaleFactor = 1.0
             self.searchResults = []
             self.searchText = ""
+            self.hasUnsavedChanges = false
             
             // Set continuous scroll mode
             if continuousScroll {
                 displayMode = .singlePageContinuous
             }
+            
+            setupAnnotationObservers()
+        }
+    }
+    
+    private func setupAnnotationObservers() {
+        NotificationCenter.default.removeObserver(self, name: .PDFAnnotationAdded, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .PDFAnnotationRemoved, object: nil)
+        
+        NotificationCenter.default.addObserver(forName: .PDFAnnotationAdded, object: nil, queue: .main) { [weak self] _ in
+            self?.markAsChanged()
+        }
+        
+        NotificationCenter.default.addObserver(forName: .PDFAnnotationRemoved, object: nil, queue: .main) { [weak self] _ in
+            self?.markAsChanged()
+        }
+    }
+    
+    private func markAsChanged() {
+        if !hasUnsavedChanges {
+            hasUnsavedChanges = true
+        }
+        if autoSaveEnabled {
+            saveDocument()
         }
     }
     
     func saveDocument() {
         guard let document = pdfDocument, let url = fileURL else { return }
         document.write(to: url)
+        hasUnsavedChanges = false
     }
 
     func saveDocumentAs() {
@@ -111,6 +142,20 @@ class DocumentManager: ObservableObject {
             document.write(to: url)
             fileURL = url
             fileName = url.lastPathComponent
+            hasUnsavedChanges = false
+        }
+    }
+
+    func closeDocumentRequested() {
+        guard pdfDocument != nil else { return }
+        
+        if hasUnsavedChanges && !autoSaveEnabled {
+            showSavePrompt = true
+        } else {
+            if autoSaveEnabled && hasUnsavedChanges {
+                saveDocument()
+            }
+            closeDocument()
         }
     }
 
@@ -124,6 +169,8 @@ class DocumentManager: ObservableObject {
         searchText = ""
         showSearch = false
         highlighterEnabled = false
+        hasUnsavedChanges = false
+        showSavePrompt = false
     }
 
     func toggleRightPanel() {
@@ -155,11 +202,13 @@ class DocumentManager: ObservableObject {
     }
     
     func nextPage() {
-        goToPage(currentPageIndex + 1)
+        let increment = (displayMode == .twoUp || displayMode == .twoUpContinuous) ? 2 : 1
+        goToPage(currentPageIndex + increment)
     }
     
     func previousPage() {
-        goToPage(currentPageIndex - 1)
+        let decrement = (displayMode == .twoUp || displayMode == .twoUpContinuous) ? 2 : 1
+        goToPage(currentPageIndex - decrement)
     }
     
     func firstPage() {

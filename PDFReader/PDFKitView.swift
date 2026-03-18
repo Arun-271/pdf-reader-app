@@ -47,7 +47,6 @@ class HighlightablePDFView: PDFView {
     private func handleSelectionChange() {
         guard let documentManager = documentManager else { return }
         
-        // Debounce to avoid showing toolbar while user is still selecting
         selectionToolbarTimer?.invalidate()
         selectionToolbarTimer = Timer.scheduledTimer(withTimeInterval: 0.4, repeats: false) { [weak self] _ in
             guard let self = self,
@@ -56,6 +55,12 @@ class HighlightablePDFView: PDFView {
                   !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                   let page = selection.pages.first else {
                 self?.selectionToolbar.hide()
+                return
+            }
+            
+            // If highlighter is enabled in toolbar, apply it immediately
+            if let dm = self.documentManager, dm.highlighterEnabled {
+                self.addHighlightAnnotation(color: dm.highlighterColor)
                 return
             }
             
@@ -577,6 +582,12 @@ struct PDFKitView: NSViewRepresentable {
         // Update display mode
         if pdfView.displayMode != documentManager.displayMode {
             pdfView.displayMode = documentManager.displayMode
+        }
+        
+        // Enhance double page spread by setting displaysAsBook
+        let isTwoUp = documentManager.displayMode == .twoUp || documentManager.displayMode == .twoUpContinuous
+        if pdfView.displaysAsBook != isTwoUp {
+            pdfView.displaysAsBook = isTwoUp
         }
     }
     

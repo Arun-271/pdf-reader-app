@@ -86,6 +86,18 @@ struct ContentView: View {
         .sheet(isPresented: $showRecentDocuments) {
             RecentDocumentsView()
         }
+        .alert("Save Changes?", isPresented: $documentManager.showSavePrompt) {
+            Button("Save") {
+                documentManager.saveDocument()
+                documentManager.closeDocument()
+            }
+            Button("Discard", role: .destructive) {
+                documentManager.closeDocument()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("You have unsaved changes in \"\(documentManager.fileName)\". Do you want to save them before closing?")
+        }
     }
 }
 
@@ -350,22 +362,40 @@ struct LiquidGlassPanel: View {
                         FocusTimerView()
                     case .progress:
                         ReadingProgressView()
-                    case .cloud:
-                        CloudSyncView()
                     case .googleDrive:
-                        // Google Drive integration - requires adding GoogleDriveView.swift to project
                         VStack(spacing: 16) {
-                            Image(systemName: "externaldrive.fill.badge.icloud")
-                                .font(.largeTitle)
+                            Image(systemName: "externaldrive.badge.icloud")
+                                .font(.system(size: 60))
                                 .foregroundColor(.blue)
-                            Text("Google Drive")
-                                .font(.headline)
-                            Text("Coming soon - Connect your Google Drive to access PDFs")
-                                .font(.caption)
+                            
+                            Text("Cloud Drives")
+                                .font(.title3.bold())
+                            
+                            Text("Access PDFs directly from Google Drive, iCloud, or Dropbox using the native file picker.")
+                                .font(.subheadline)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                            
+                            Button(action: { documentManager.openDocument() }) {
+                                Label("Open from Cloud", systemImage: "folder")
+                                    .frame(maxWidth: 160)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.large)
+                            .padding(.top, 8)
+                            
+                            if documentManager.pdfDocument != nil {
+                                Button(action: { documentManager.saveDocumentAs() }) {
+                                    Label("Export to Cloud", systemImage: "square.and.arrow.up")
+                                        .frame(maxWidth: 160)
+                                }
+                                .buttonStyle(.bordered)
+                                .controlSize(.large)
+                            }
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
