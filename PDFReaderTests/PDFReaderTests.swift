@@ -43,6 +43,7 @@ final class PDFReaderTests: XCTestCase {
     
     func testPageNavigation() {
         let manager = DocumentManager()
+        manager.displayMode = .singlePage // Ensures deterministic page jumps for testing
         
         // Create a simple test PDF
         let pdfDocument = createTestPDF(pageCount: 5)
@@ -1059,5 +1060,25 @@ final class MemoryOptimizationTests: XCTestCase {
         XCTAssertLessThanOrEqual(manager.recentDocuments.count, 20)
         
         manager.clearAll()
+    }
+}
+
+// MARK: - DocumentManager Extended Tests
+
+final class DocumentManagerExtendedTests: XCTestCase {
+    
+    func testAutosaveInitialState() {
+        let manager = DocumentManager()
+        
+        let initial = manager.autoSaveEnabled
+        manager.autoSaveEnabled = !initial
+        XCTAssertNotEqual(manager.autoSaveEnabled, initial)
+    }
+    
+    func testHasUnsavedChangesInitialState() {
+        let manager = DocumentManager()
+        
+        // A fresh document manager should not have unsaved changes
+        XCTAssertFalse(manager.hasUnsavedChanges)
     }
 }

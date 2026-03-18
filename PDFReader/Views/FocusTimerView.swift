@@ -157,7 +157,7 @@ struct FocusTimerView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color(NSColor.controlBackgroundColor))
+                .fill(Color.secondarySystemBackground)
         )
     }
     
@@ -256,7 +256,7 @@ struct FocusTimerSettingsView: View {
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(NSColor.controlBackgroundColor))
+                            .fill(Color.secondarySystemBackground)
                     )
                     
                     // Automation Settings
@@ -305,7 +305,7 @@ struct FocusTimerSettingsView: View {
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(NSColor.controlBackgroundColor))
+                            .fill(Color.secondarySystemBackground)
                     )
                     
                     // Sound Settings
@@ -327,7 +327,7 @@ struct FocusTimerSettingsView: View {
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(NSColor.controlBackgroundColor))
+                            .fill(Color.secondarySystemBackground)
                     )
                 }
                 .padding()
@@ -472,7 +472,7 @@ struct CompactFocusTimer: View {
         .padding(.vertical, 4)
         .background(
             RoundedRectangle(cornerRadius: 6)
-                .fill(Color(NSColor.controlBackgroundColor))
+                .fill(Color.secondarySystemBackground)
         )
     }
 }

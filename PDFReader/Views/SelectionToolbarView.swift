@@ -9,6 +9,7 @@ import SwiftUI
 import PDFKit
 
 // MARK: - Selection Toolbar Window Controller
+#if os(macOS)
 class SelectionToolbarController: NSObject, ObservableObject {
     static let shared = SelectionToolbarController()
     
@@ -96,6 +97,34 @@ class SelectionToolbarController: NSObject, ObservableObject {
         show(at: convertedPoint, in: pdfView, documentManager: documentManager!)
     }
     
+    func showForAnnotation(_ annotation: PDFAnnotation, in pdfView: PDFView, documentManager: DocumentManager) {
+        self.pdfView = pdfView
+        self.documentManager = documentManager
+        self.selectedText = annotation.contents ?? ""
+        self.hasExistingHighlight = true
+        self.existingAnnotation = annotation
+        
+        guard let page = annotation.page else { return }
+        
+        let bounds = annotation.bounds
+        let point = CGPoint(x: bounds.midX, y: bounds.maxY)
+        let convertedPoint = pdfView.convert(point, from: page)
+        
+        let screenPoint = pdfView.window?.convertPoint(toScreen: pdfView.convert(convertedPoint, to: nil)) ?? convertedPoint
+        
+        if toolbarWindow == nil {
+            createWindow()
+        } else {
+            updateContent()
+        }
+        
+        let windowFrame = NSRect(x: screenPoint.x - 175, y: screenPoint.y + 20, width: 350, height: 50)
+        toolbarWindow?.setFrame(windowFrame, display: true)
+        toolbarWindow?.orderFront(nil)
+        
+        isVisible = true
+    }
+    
     func hide() {
         toolbarWindow?.orderOut(nil)
         isVisible = false
@@ -129,7 +158,7 @@ class SelectionToolbarController: NSObject, ObservableObject {
     
     // MARK: - Actions
     
-    func highlightSelection(color: NSColor) {
+    func highlightSelection(color: PlatformColor) {
         guard let pdfView = pdfView as? HighlightablePDFView else { return }
         UserDefaults.standard.setColor(color, forKey: "lastHighlightColor")
         addAnnotation(type: .highlight, color: color.withAlphaComponent(0.5))
@@ -193,7 +222,7 @@ class SelectionToolbarController: NSObject, ObservableObject {
         hide()
     }
     
-    private func addAnnotation(type: PDFAnnotationSubtype, color: NSColor) {
+    private func addAnnotation(type: PDFAnnotationSubtype, color: PlatformColor) {
         guard let pdfView = pdfView,
               let selection = pdfView.currentSelection else { return }
         
@@ -220,7 +249,7 @@ class SelectionToolbarController: NSObject, ObservableObject {
 struct SelectionToolbarContent: View {
     @ObservedObject var controller: SelectionToolbarController
     
-    private let colors: [NSColor] = [
+    private let colors: [PlatformColor] = [
         .systemYellow, .systemGreen, .systemBlue, .systemPink, .systemOrange, .systemPurple
     ]
     
@@ -313,7 +342,7 @@ struct SelectionToolbarContent: View {
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 25)
-                .fill(Color(NSColor.windowBackgroundColor).opacity(0.95))
+                .fill(Color.systemBackground.opacity(0.95))
                 .shadow(color: .black.opacity(0.3), radius: 8, y: 2)
         )
         .overlay(
@@ -322,7 +351,7 @@ struct SelectionToolbarContent: View {
         )
     }
     
-    private func colorName(_ color: NSColor) -> String {
+    private func colorName(_ color: PlatformColor) -> String {
         switch color {
         case .systemYellow: return "Yellow"
         case .systemGreen: return "Green"
@@ -334,3 +363,5 @@ struct SelectionToolbarContent: View {
         }
     }
 }
+
+#endif

@@ -31,7 +31,7 @@ enum TimerMode: String, CaseIterable {
         }
     }
     
-    var color: NSColor {
+    var color: PlatformColor {
         switch self {
         case .pomodoro: return .systemRed
         case .shortBreak: return .systemGreen

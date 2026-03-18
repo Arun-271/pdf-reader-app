@@ -133,7 +133,7 @@ struct AISettingsTabView: View {
                     }
                 }
                 .padding(16)
-                .background(Color(NSColor.controlBackgroundColor))
+                .background(Color.secondarySystemBackground)
                 .cornerRadius(12)
                 
                 // API Key Card (if needed)
@@ -197,7 +197,7 @@ struct AISettingsTabView: View {
                         }
                     }
                     .padding(16)
-                    .background(Color(NSColor.controlBackgroundColor))
+                    .background(Color.secondarySystemBackground)
                     .cornerRadius(12)
                 } else if aiManager.settings.provider == .ollama {
                     // Ollama info card
@@ -224,7 +224,7 @@ struct AISettingsTabView: View {
                         }
                     }
                     .padding(16)
-                    .background(Color(NSColor.controlBackgroundColor))
+                    .background(Color.secondarySystemBackground)
                     .cornerRadius(12)
                 }
                 
@@ -290,7 +290,7 @@ struct AISettingsTabView: View {
                     }
                 }
                 .padding(16)
-                .background(Color(NSColor.controlBackgroundColor))
+                .background(Color.secondarySystemBackground)
                 .cornerRadius(12)
                 
                 // Save button

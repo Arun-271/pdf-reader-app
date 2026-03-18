@@ -51,7 +51,7 @@ enum AnnotationFilter: String, CaseIterable {
 struct AnnotationsView: View {
     @EnvironmentObject var documentManager: DocumentManager
     @State private var selectedTool: AnnotationTool = .highlight
-    @State private var selectedColor: NSColor = .systemYellow
+    @State private var selectedColor: PlatformColor = .systemYellow
     @State private var annotations: [PDFAnnotation] = []
     @State private var showColorPicker = false
     @State private var hoveredAnnotationID: ObjectIdentifier?
@@ -61,7 +61,7 @@ struct AnnotationsView: View {
     @State private var showAddNoteSheet = false
     @State private var newNoteText = ""
     
-    private let presetColors: [NSColor] = [
+    private let presetColors: [PlatformColor] = [
         .systemYellow, .systemGreen, .systemBlue,
         .systemPink, .systemOrange, .systemPurple
     ]
@@ -121,9 +121,10 @@ struct AnnotationsView: View {
             // Annotations List
             annotationsList
         }
-        .background(Color(NSColor.controlBackgroundColor).opacity(0.3))
+        .background(Color.secondarySystemBackground.opacity(0.3))
         .onAppear { refreshAnnotations() }
         .onChange(of: documentManager.currentPageIndex) { _ in refreshAnnotations() }
+        .onChange(of: documentManager.annotationsUpdateId) { _ in refreshAnnotations() }
         .onReceive(NotificationCenter.default.publisher(for: .PDFAnnotationAdded)) { _ in
             refreshAnnotations()
         }
@@ -216,7 +217,7 @@ struct AnnotationsView: View {
                     .padding(.vertical, 6)
                     .background(
                         RoundedRectangle(cornerRadius: 6)
-                            .fill(documentManager.addNoteMode ? Color.orange.opacity(0.2) : Color(NSColor.controlBackgroundColor))
+                            .fill(documentManager.addNoteMode ? Color.orange.opacity(0.2) : Color.secondarySystemBackground)
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 6)
@@ -262,7 +263,7 @@ struct AnnotationsView: View {
                 }
             }
             .padding(8)
-            .background(Color(NSColor.textBackgroundColor).opacity(0.5))
+            .background(Color.systemBackground.opacity(0.5))
             .cornerRadius(8)
             
             // Filter pills
@@ -497,7 +498,7 @@ struct AnnotationsView: View {
                 for existing in overlapping {
                     page.removeAnnotation(existing)
                 }
-                let annotColor: NSColor = selectedTool == .highlight ? selectedColor.withAlphaComponent(0.5) : selectedColor
+                let annotColor: PlatformColor = selectedTool == .highlight ? selectedColor.withAlphaComponent(0.5) : selectedColor
                 annotation = PDFAnnotation(bounds: unionRect, forType: selectedTool.pdfAnnotationType, withProperties: nil)
                 annotation.color = annotColor
                 page.addAnnotation(annotation)
@@ -531,7 +532,7 @@ struct AnnotationsView: View {
             annotation = PDFAnnotation(bounds: bounds, forType: .freeText, withProperties: nil)
             annotation.color = selectedColor
             annotation.contents = selection.string ?? ""
-            annotation.font = NSFont.systemFont(ofSize: 12)
+            annotation.font = PlatformFont.systemFont(ofSize: 12)
         }
 
         page.addAnnotation(annotation)
@@ -657,7 +658,7 @@ struct FilterPill: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(isSelected ? Color.accentColor : Color(NSColor.controlBackgroundColor))
+            .background(isSelected ? Color.accentColor : Color.secondarySystemBackground)
             .foregroundColor(isSelected ? .white : .primary)
             .cornerRadius(6)
         }
@@ -805,7 +806,7 @@ struct EnhancedAnnotationCard: View {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(isHovered ? Color(NSColor.selectedContentBackgroundColor).opacity(0.15) : Color(NSColor.controlBackgroundColor).opacity(0.5))
+                .fill(isHovered ? Color.accentColor.opacity(0.15) : Color.secondarySystemBackground.opacity(0.5))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 10)
@@ -827,7 +828,7 @@ struct EnhancedAnnotationCard: View {
 // MARK: - Add Note Sheet
 struct AddNoteSheet: View {
     @Binding var noteText: String
-    let color: NSColor
+    let color: PlatformColor
     let onSave: (String) -> Void
     @Environment(\.dismiss) private var dismiss
     @FocusState private var isFocused: Bool
@@ -849,7 +850,7 @@ struct AddNoteSheet: View {
                 .font(.system(size: 13))
                 .frame(minHeight: 120)
                 .padding(8)
-                .background(Color(NSColor.textBackgroundColor))
+                .background(Color.systemBackground)
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
@@ -921,7 +922,7 @@ struct EditNoteSheet: View {
                 .font(.system(size: 13))
                 .frame(minHeight: 120)
                 .padding(8)
-                .background(Color(NSColor.textBackgroundColor))
+                .background(Color.systemBackground)
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
@@ -980,7 +981,7 @@ extension PDFAnnotation: @retroactive Identifiable {
 
 // MARK: - Color Dot
 struct ColorDot: View {
-    let color: NSColor
+    let color: PlatformColor
     let isSelected: Bool
     let action: () -> Void
     
@@ -1083,7 +1084,7 @@ struct AnnotationRow: View {
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 6)
-                .fill(isHovered ? Color(NSColor.selectedContentBackgroundColor).opacity(0.3) : Color.clear)
+                .fill(isHovered ? Color.accentColor.opacity(0.3) : Color.clear)
         )
         .contentShape(Rectangle())
         .onTapGesture(perform: onTap)
@@ -1097,7 +1098,7 @@ struct AnnotationRow: View {
 
 // MARK: - Color Picker Sheet
 struct ColorPickerSheet: View {
-    @Binding var selectedColor: NSColor
+    @Binding var selectedColor: PlatformColor
     @Environment(\.dismiss) private var dismiss
     @State private var pickedColor: Color = .yellow
     
@@ -1115,7 +1116,7 @@ struct ColorPickerSheet: View {
                     .keyboardShortcut(.cancelAction)
                 
                 Button("Apply") {
-                    selectedColor = NSColor(pickedColor)
+                    selectedColor = PlatformColor(pickedColor)
                     dismiss()
                 }
                 .keyboardShortcut(.defaultAction)
@@ -1127,9 +1128,9 @@ struct ColorPickerSheet: View {
     }
 }
 
-// MARK: - NSColor Extension
-extension NSColor {
-    func isApproximatelyEqual(to other: NSColor) -> Bool {
+// MARK: - PlatformColor Extension
+extension PlatformColor {
+    func isApproximatelyEqual(to other: PlatformColor) -> Bool {
         guard let c1 = self.usingColorSpace(.deviceRGB),
               let c2 = other.usingColorSpace(.deviceRGB) else { return false }
         let tolerance: CGFloat = 0.01

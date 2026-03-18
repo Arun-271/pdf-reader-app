@@ -143,7 +143,7 @@ struct OCRView: View {
             .padding(8)
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color(NSColor.textBackgroundColor))
+                    .fill(Color.systemBackground)
             )
             .padding()
             
@@ -265,7 +265,7 @@ struct OCRPageSection: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(Color(NSColor.textBackgroundColor))
+                        .fill(Color.systemBackground)
                 )
         }
     }

@@ -135,7 +135,7 @@ struct GoogleDriveView: View {
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 8)
-                .background(Color(NSColor.controlBackgroundColor))
+                .background(Color.secondarySystemBackground)
             }
             
             // File list

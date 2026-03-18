@@ -14,8 +14,9 @@ struct ToolbarView: View {
     @State private var pageInputText: String = ""
     @State private var isEditingPage: Bool = false
     @State private var showHighlighterColorPicker: Bool = false
+    @State private var showHighlighterPopover: Bool = false
     
-    private let highlighterColors: [(String, NSColor)] = [
+    private let highlighterColors: [(String, PlatformColor)] = [
         ("Yellow", .systemYellow),
         ("Green", .systemGreen),
         ("Blue", .systemBlue),
@@ -35,21 +36,38 @@ struct ToolbarView: View {
         documentManager.pdfDocument != nil
     }
     
+    struct ToolbarGroupModifier: ViewModifier {
+        func body(content: Content) -> some View {
+            content
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    Capsule()
+                        .fill(.regularMaterial)
+                        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                )
+                .overlay(
+                    Capsule().stroke(Color.primary.opacity(0.05), lineWidth: 0.5)
+                )
+        }
+    }
+
     var body: some View {
-        HStack(spacing: 12) {
-            // Sidebar toggle
-            Button(action: { documentManager.toggleSidebar() }) {
-                Image(systemName: "sidebar.left")
-                    .foregroundColor(documentManager.showSidebar ? .accentColor : .secondary)
+        HStack(spacing: 16) {
+            
+            // Group 1: Sidebar
+            HStack(spacing: 8) {
+                Button(action: { documentManager.toggleSidebar() }) {
+                    Image(systemName: "sidebar.left")
+                        .foregroundColor(documentManager.showSidebar ? .accentColor : .secondary)
+                }
+                .buttonStyle(.borderless)
+                .help("Toggle Sidebar (⌥⌘S)")
             }
-            .buttonStyle(.borderless)
-            .help("Toggle Sidebar (⌥⌘S)")
+            .modifier(ToolbarGroupModifier())
             
-            Divider()
-                .frame(height: 20)
-            
-            // Navigation controls
-            HStack(spacing: 6) {
+            // Group 2: Navigation
+            HStack(spacing: 8) {
                 Button(action: { documentManager.previousPage() }) {
                     Image(systemName: "chevron.left")
                 }
@@ -57,12 +75,11 @@ struct ToolbarView: View {
                 .disabled(!hasDocument || documentManager.currentPageIndex <= 0)
                 .help("Previous Page")
                 
-                // Page number display
                 HStack(spacing: 4) {
                     if isEditingPage && hasDocument {
                         TextField("", text: $pageInputText)
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 50)
+                            .frame(width: 40)
                             .multilineTextAlignment(.center)
                             .onSubmit {
                                 if let page = Int(pageInputText) {
@@ -80,7 +97,6 @@ struct ToolbarView: View {
                                 }
                             }
                     }
-                    
                     Text("of \(hasDocument ? documentManager.pageCount : 0)")
                         .foregroundColor(.secondary)
                 }
@@ -93,12 +109,10 @@ struct ToolbarView: View {
                 .disabled(!hasDocument || documentManager.currentPageIndex >= documentManager.pageCount - 1)
                 .help("Next Page")
             }
+            .modifier(ToolbarGroupModifier())
             
-            Divider()
-                .frame(height: 20)
-            
-            // Zoom controls
-            HStack(spacing: 6) {
+            // Group 3: Zoom
+            HStack(spacing: 10) {
                 Button(action: { documentManager.zoomOut() }) {
                     Image(systemName: "minus.magnifyingglass")
                 }
@@ -124,33 +138,31 @@ struct ToolbarView: View {
                 .disabled(!hasDocument)
                 .help("Zoom to Fit")
             }
+            .modifier(ToolbarGroupModifier())
             
-            Divider()
-                .frame(height: 20)
-            
-            // Page layout controls
-            HStack(spacing: 4) {
+            // Group 4: Layout & View Modes
+            HStack(spacing: 12) {
                 Button(action: { documentManager.setDisplayMode(.singlePage) }) {
                     Image(systemName: "doc")
                         .foregroundColor(documentManager.displayMode == .singlePage ? .accentColor : .secondary)
-                }
-                .buttonStyle(.borderless)
-                .help("Single Page")
-                
+            }
+            .buttonStyle(.borderless)
+            .help("Single Page")
+            
                 Button(action: { documentManager.setDisplayMode(.singlePageContinuous) }) {
                     Image(systemName: "doc.text")
                         .foregroundColor(documentManager.displayMode == .singlePageContinuous ? .accentColor : .secondary)
-                }
-                .buttonStyle(.borderless)
-                .help("Single Page Continuous")
-                
+            }
+            .buttonStyle(.borderless)
+            .help("Single Page Continuous")
+            
                 Button(action: { documentManager.setDisplayMode(.twoUp) }) {
                     Image(systemName: "book")
                         .foregroundColor(documentManager.displayMode == .twoUp ? .accentColor : .secondary)
-                }
-                .buttonStyle(.borderless)
-                .help("Two Pages")
-                
+            }
+            .buttonStyle(.borderless)
+            .help("Two Pages")
+            
                 Button(action: { documentManager.setDisplayMode(.twoUpContinuous) }) {
                     Image(systemName: "book.pages")
                         .foregroundColor(documentManager.displayMode == .twoUpContinuous ? .accentColor : .secondary)
@@ -159,168 +171,130 @@ struct ToolbarView: View {
                 .help("Two Pages Continuous")
             }
             .disabled(!hasDocument)
+            .modifier(ToolbarGroupModifier())
             
-            Divider()
-                .frame(height: 20)
-            
-            // Highlighter with color indicator and dropdown
-            Menu {
-                // Toggle highlighter
+            // Group 5: Tools (Highlight, Bookmark, Save, Print, Focus)
+            HStack(spacing: 14) {
                 Button(action: {
-                    documentManager.highlighterEnabled.toggle()
-                }) {
-                    HStack {
-                        Text(documentManager.highlighterEnabled ? "Disable Auto-Highlight" : "Enable Auto-Highlight")
-                        if documentManager.highlighterEnabled {
-                            Image(systemName: "checkmark")
-                        }
-                    }
-                }
-
-                Divider()
-
-                // Color options
-                ForEach(highlighterColors, id: \.0) { name, color in
-                    Button(action: {
-                        documentManager.highlighterColor = color
+                    if documentManager.highlighterEnabled {
+                        documentManager.highlighterEnabled = false
+                    } else {
                         documentManager.highlighterEnabled = true
-                    }) {
-                        HStack {
-                            Image(systemName: "circle.fill")
-                                .foregroundColor(Color(color))
-                            Text(name)
-                            if documentManager.highlighterColor == color && documentManager.highlighterEnabled {
-                                Image(systemName: "checkmark")
-                            }
+                        showHighlighterPopover = true
+                    }
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "highlighter")
+                            .font(.system(size: 14))
+                            .foregroundColor(documentManager.highlighterEnabled ? .white : .primary)
+                        
+                        Circle()
+                            .fill(Color(documentManager.highlighterColor))
+                            .frame(width: 10, height: 10)
+                            .overlay(Circle().stroke(Color.white.opacity(0.3), lineWidth: 0.5))
+                        
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundColor(documentManager.highlighterEnabled ? .white.opacity(0.8) : .secondary)
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule().fill(documentManager.highlighterEnabled ? Color.accentColor : Color.clear)
+                    )
+                }
+                .buttonStyle(.plain)
+                .disabled(!hasDocument)
+                .help("Highlighter (⌘H)")
+                .popover(isPresented: $showHighlighterPopover, arrowEdge: .bottom) {
+                    HighlighterPopoverContent(
+                        documentManager: documentManager,
+                        colors: highlighterColors,
+                        showPicker: $showHighlighterColorPicker
+                    )
+                }
+                
+                Button(action: {
+                    bookmarkManager.toggleBookmark(
+                        for: documentManager.fileName,
+                        pageIndex: documentManager.currentPageIndex
+                    )
+                }) {
+                    Image(systemName: isCurrentPageBookmarked ? "bookmark.fill" : "bookmark")
+                        .foregroundColor(isCurrentPageBookmarked ? .accentColor : .secondary)
+                }
+                .buttonStyle(.borderless)
+                .help("Toggle Bookmark (⌘D)")
+                .disabled(!hasDocument)
+                    
+                Button(action: {
+                    documentManager.autoSaveEnabled.toggle()
+                    if documentManager.autoSaveEnabled && documentManager.hasUnsavedChanges {
+                        documentManager.saveDocument()
+                    }
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                        if documentManager.autoSaveEnabled {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 10))
                         }
                     }
+                    .foregroundColor(documentManager.autoSaveEnabled ? .green : .secondary)
                 }
-
-                Divider()
-
-                Button(action: {
-                    showHighlighterColorPicker = true
-                }) {
-                    HStack {
-                        Image(systemName: "paintpalette")
-                        Text("Custom Color...")
-                    }
-                }
-            } label: {
-                HStack(spacing: 4) {
-                    // Highlighter icon with colored circle
-                    Image(systemName: "highlighter")
-                        .font(.system(size: 14))
-                        .foregroundColor(documentManager.highlighterEnabled ? .primary : .secondary)
-                    
-                    // Color circle indicator - always visible
-                    Circle()
-                        .fill(Color(documentManager.highlighterColor))
-                        .frame(width: 10, height: 10)
-                        .overlay(
-                            Circle()
-                                .stroke(Color.primary.opacity(0.3), lineWidth: 0.5)
-                        )
-                    
-                    // Dropdown chevron
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: 8, weight: .bold))
-                        .foregroundColor(.secondary)
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
-                .background(
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(documentManager.highlighterEnabled ? Color.accentColor.opacity(0.15) : Color.clear)
-                )
-            }
-            .menuStyle(.borderlessButton)
-            .frame(width: 50)
-            .disabled(!hasDocument)
-            .help("Highlighter (⌘H)")
-            
-            Divider()
-                .frame(height: 20)
-            
-            // Bookmark toggle
-            Button(action: {
-                bookmarkManager.toggleBookmark(
-                    for: documentManager.fileName,
-                    pageIndex: documentManager.currentPageIndex
-                )
-            }) {
-                Image(systemName: isCurrentPageBookmarked ? "bookmark.fill" : "bookmark")
-                    .foregroundColor(isCurrentPageBookmarked ? .accentColor : .secondary)
-            }
-            .buttonStyle(.borderless)
-            .help("Toggle Bookmark (⌘D)")
-            .disabled(!hasDocument)
-            
-            Divider()
-                .frame(height: 20)
+                .buttonStyle(.borderless)
+                .help("Toggle Auto Save")
+                .disabled(!hasDocument)
                 
-            // Auto Save toggle
-            Button(action: {
-                documentManager.autoSaveEnabled.toggle()
-                if documentManager.autoSaveEnabled && documentManager.hasUnsavedChanges {
-                    documentManager.saveDocument()
+                Button(action: { documentManager.printDocument() }) {
+                    Image(systemName: "printer")
                 }
-            }) {
-                HStack(spacing: 4) {
-                    Image(systemName: "arrow.triangle.2.circlepath")
-                    if documentManager.autoSaveEnabled {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 10))
-                    }
+                .buttonStyle(.borderless)
+                .help("Print (⌘P)")
+                .disabled(!hasDocument)
+                
+                Button(action: { documentManager.showFocusMode.toggle() }) {
+                    Image(systemName: documentManager.showFocusMode ? "eye.fill" : "eye")
+                        .foregroundColor(documentManager.showFocusMode ? .accentColor : .secondary)
                 }
-                .foregroundColor(documentManager.autoSaveEnabled ? .green : .secondary)
+                .buttonStyle(.borderless)
+                .help(documentManager.showFocusMode ? "Exit Focus Mode" : "Focus Mode")
+                .disabled(!hasDocument)
             }
-            .buttonStyle(.borderless)
-            .help("Toggle Auto Save")
-            .disabled(!hasDocument)
-            
-            // Print button
-            Button(action: { documentManager.printDocument() }) {
-                Image(systemName: "printer")
-            }
-            .buttonStyle(.borderless)
-            .help("Print (⌘P)")
-            .disabled(documentManager.pdfDocument == nil)
-            
-            // Focus Mode toggle
-            Button(action: { documentManager.showFocusMode.toggle() }) {
-                Image(systemName: documentManager.showFocusMode ? "eye.fill" : "eye")
-                    .foregroundColor(documentManager.showFocusMode ? .accentColor : .secondary)
-            }
-            .buttonStyle(.borderless)
-            .help(documentManager.showFocusMode ? "Exit Focus Mode" : "Focus Mode")
-            .disabled(!hasDocument)
+            .modifier(ToolbarGroupModifier())
             
             Spacer()
             
-            // Search toggle
-            Button(action: { documentManager.toggleSearch() }) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(documentManager.showSearch ? .accentColor : .secondary)
+            // Group 6: Search & Sidebar Right
+            HStack(spacing: 12) {
+                Button(action: { documentManager.toggleSearch() }) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(documentManager.showSearch ? .accentColor : .secondary)
+                }
+                .buttonStyle(.borderless)
+                .help("Find (⌘F)")
+                .disabled(!hasDocument)
+                
+                Button(action: { documentManager.toggleRightPanel() }) {
+                    Image(systemName: "sidebar.right")
+                        .foregroundColor(documentManager.showRightPanel ? .accentColor : .secondary)
+                }
+                .buttonStyle(.borderless)
+                .help("Toggle Right Panel (⌥⌘R)")
             }
-            .buttonStyle(.borderless)
-            .help("Find (⌘F)")
-            .disabled(documentManager.pdfDocument == nil)
+            .modifier(ToolbarGroupModifier())
             
-            Divider()
-                .frame(height: 20)
-            
-            // Right panel toggle only (tools are inside the panel)
-            Button(action: { documentManager.toggleRightPanel() }) {
-                Image(systemName: "sidebar.right")
-                    .foregroundColor(documentManager.showRightPanel ? .accentColor : .secondary)
-            }
-            .buttonStyle(.borderless)
-            .help("Toggle Right Panel (⌥⌘R)")
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(.regularMaterial)
+        .padding(.vertical, 6)
+        .contentShape(Rectangle()) // Make transparent areas clickable
+        .onTapGesture(count: 2) {
+            #if os(macOS)
+            if let window = NSApplication.shared.windows.first(where: { $0.isKeyWindow }) {
+                window.zoom(nil)
+            }
+            #endif
+        }
         .sheet(isPresented: $showHighlighterColorPicker) {
             HighlighterColorPickerSheet(
                 currentColor: documentManager.highlighterColor,
@@ -333,14 +307,81 @@ struct ToolbarView: View {
     }
 }
 
+// MARK: - Highlighter Popover Content
+struct HighlighterPopoverContent: View {
+    @ObservedObject var documentManager: DocumentManager
+    let colors: [(String, PlatformColor)]
+    @Binding var showPicker: Bool
+    @Environment(\.dismiss) var dismiss
+    
+    let columns = [
+        GridItem(.adaptive(minimum: 36, maximum: 36), spacing: 8)
+    ]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Auto-Highlight Color")
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .padding(.horizontal, 4)
+            
+            LazyVGrid(columns: columns, spacing: 8) {
+                ForEach(colors, id: \.0) { name, color in
+                    Button(action: {
+                        documentManager.highlighterColor = color
+                        documentManager.highlighterEnabled = true
+                        dismiss()
+                    }) {
+                        Circle()
+                            .fill(Color(color))
+                            .frame(width: 28, height: 28)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                            )
+                            .overlay(
+                                documentManager.highlighterColor == color && documentManager.highlighterEnabled ? 
+                                Image(systemName: "checkmark").font(.system(size: 12, weight: .bold)).foregroundColor(.white)
+                                : nil
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .help(name)
+                }
+            }
+            .padding(.horizontal, 4)
+            
+            Divider()
+            
+            Button(action: {
+                dismiss()
+                showPicker = true
+            }) {
+                HStack {
+                    Image(systemName: "paintpalette")
+                    Text("Custom Color...")
+                    Spacer()
+                }
+                .padding(.vertical, 6)
+                .padding(.horizontal, 8)
+                .contentShape(Rectangle())
+                .background(Color.primary.opacity(0.001)) // Make entire row clickable
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .frame(width: 170)
+    }
+}
+
 // MARK: - Highlighter Color Picker
 struct HighlighterColorPickerSheet: View {
-    let currentColor: NSColor
-    let onApply: (NSColor) -> Void
+    let currentColor: PlatformColor
+    let onApply: (PlatformColor) -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var pickedColor: Color
 
-    init(currentColor: NSColor, onApply: @escaping (NSColor) -> Void) {
+    init(currentColor: PlatformColor, onApply: @escaping (PlatformColor) -> Void) {
         self.currentColor = currentColor
         self.onApply = onApply
         _pickedColor = State(initialValue: Color(currentColor))
@@ -360,7 +401,7 @@ struct HighlighterColorPickerSheet: View {
                     .keyboardShortcut(.cancelAction)
 
                 Button("Apply") {
-                    onApply(NSColor(pickedColor))
+                    onApply(PlatformColor(pickedColor))
                     dismiss()
                 }
                 .keyboardShortcut(.defaultAction)

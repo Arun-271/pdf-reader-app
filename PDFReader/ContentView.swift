@@ -22,7 +22,11 @@ struct ContentView: View {
             if !documentManager.showFocusMode {
                 VStack(spacing: 0) {
                     // Toolbar
-                    ToolbarView()
+                    if documentManager.showToolbar {
+                        ToolbarView()
+                            .zIndex(1)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
                     
                     // Search bar (conditional)
                     if documentManager.showSearch {
@@ -98,6 +102,15 @@ struct ContentView: View {
         } message: {
             Text("You have unsaved changes in \"\(documentManager.fileName)\". Do you want to save them before closing?")
         }
+        .background(
+            Button("Toggle Toolbar") {
+                withAnimation(.spring()) {
+                    documentManager.showToolbar.toggle()
+                }
+            }
+            .keyboardShortcut("t", modifiers: [.command, .option])
+            .hidden()
+        )
     }
 }
 
@@ -207,7 +220,7 @@ struct LeftSidebarView: View {
             }
             .padding(.horizontal, 6)
             .padding(.vertical, 8)
-            .background(Color(NSColor.controlBackgroundColor))
+            .background(Color.secondarySystemBackground)
             
             Divider()
 
@@ -292,7 +305,7 @@ struct LiquidGlassPanel: View {
     
     // Essential modes for the panel
     private let essentialModes: [RightPanelMode] = [.ai, .dictionary, .webSearch, .citations, .timer]
-    private let moreMenuModes: [RightPanelMode] = [.ocr, .progress, .cloud, .googleDrive]
+    private let moreMenuModes: [RightPanelMode] = [.ocr, .progress, .cloud]
     
     var body: some View {
         GeometryReader { geometry in
@@ -362,40 +375,8 @@ struct LiquidGlassPanel: View {
                         FocusTimerView()
                     case .progress:
                         ReadingProgressView()
-                    case .googleDrive:
-                        VStack(spacing: 16) {
-                            Image(systemName: "externaldrive.badge.icloud")
-                                .font(.system(size: 60))
-                                .foregroundColor(.blue)
-                            
-                            Text("Cloud Drives")
-                                .font(.title3.bold())
-                            
-                            Text("Access PDFs directly from Google Drive, iCloud, or Dropbox using the native file picker.")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal)
-                            
-                            Button(action: { documentManager.openDocument() }) {
-                                Label("Open from Cloud", systemImage: "folder")
-                                    .frame(maxWidth: 160)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .controlSize(.large)
-                            .padding(.top, 8)
-                            
-                            if documentManager.pdfDocument != nil {
-                                Button(action: { documentManager.saveDocumentAs() }) {
-                                    Label("Export to Cloud", systemImage: "square.and.arrow.up")
-                                        .frame(maxWidth: 160)
-                                }
-                                .buttonStyle(.bordered)
-                                .controlSize(.large)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding()
+                    case .cloud:
+                        CloudSyncView()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -427,7 +408,6 @@ struct LiquidGlassPanel: View {
         case .timer: return "timer"
         case .progress: return "chart.bar"
         case .cloud: return "icloud"
-        case .googleDrive: return "externaldrive"
         }
     }
     
@@ -441,7 +421,6 @@ struct LiquidGlassPanel: View {
         case .timer: return "Timer"
         case .progress: return "Stats"
         case .cloud: return "Cloud"
-        case .googleDrive: return "Drive"
         }
     }
 }
@@ -464,7 +443,6 @@ struct GlassPanelButton: View {
         case .timer: return "timer"
         case .progress: return "chart.bar"
         case .cloud: return "icloud"
-        case .googleDrive: return "externaldrive"
         }
     }
 
@@ -478,7 +456,6 @@ struct GlassPanelButton: View {
         case .timer: return "Timer"
         case .progress: return "Stats"
         case .cloud: return "Cloud"
-        case .googleDrive: return "Drive"
         }
     }
 
@@ -610,7 +587,7 @@ struct WelcomeView: View {
             .padding(.top, 20)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(NSColor.windowBackgroundColor))
+        .background(Color.systemBackground)
     }
     
     private func openRecentDocument(_ doc: RecentDocument) {
@@ -738,6 +715,7 @@ struct InlineFocusModeView: View {
             resetHideTimer()
             
             // Add ESC key monitoring
+            #if os(macOS)
             escKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
                 if event.keyCode == 53 { // ESC key
                     DispatchQueue.main.async {
@@ -747,6 +725,7 @@ struct InlineFocusModeView: View {
                 }
                 return event
             }
+            #endif
         }
         .onDisappear {
             ReadingProgressManager.shared.endCurrentSession()
@@ -754,7 +733,9 @@ struct InlineFocusModeView: View {
             
             // Remove ESC key monitoring
             if let monitor = escKeyMonitor {
+                #if os(macOS)
                 NSEvent.removeMonitor(monitor)
+                #endif
                 escKeyMonitor = nil
             }
         }

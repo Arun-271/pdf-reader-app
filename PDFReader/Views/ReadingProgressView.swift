@@ -156,7 +156,7 @@ struct ReadingProgressView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(NSColor.controlBackgroundColor))
+                .fill(Color.secondarySystemBackground)
         )
         .padding(.horizontal)
     }
@@ -243,7 +243,7 @@ struct ReadingProgressView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(NSColor.controlBackgroundColor))
+                .fill(Color.secondarySystemBackground)
         )
     }
     
@@ -297,7 +297,7 @@ struct StatCard: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color(NSColor.controlBackgroundColor))
+                .fill(Color.secondarySystemBackground)
         )
     }
 }
@@ -339,7 +339,7 @@ struct DocumentProgressRow: View {
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color(NSColor.controlBackgroundColor).opacity(0.5))
+                .fill(Color.secondarySystemBackground.opacity(0.5))
         )
         .padding(.horizontal)
     }

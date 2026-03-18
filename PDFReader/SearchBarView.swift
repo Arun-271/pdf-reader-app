@@ -34,7 +34,7 @@ struct SearchBarView: View {
                 }
             }
             .padding(8)
-            .background(Color(NSColor.textBackgroundColor))
+            .background(Color.systemBackground)
             .cornerRadius(8)
             .frame(maxWidth: 300)
             
@@ -80,7 +80,7 @@ struct SearchBarView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
-        .background(Color(NSColor.controlBackgroundColor))
+        .background(Color.secondarySystemBackground)
         .onAppear {
             isSearchFieldFocused = true
         }

@@ -25,7 +25,7 @@ enum SidebarViewMode: String, CaseIterable {
 final class ThumbnailCache {
     static let shared = ThumbnailCache()
     
-    private var cache = NSCache<NSString, NSImage>()
+    private var cache = NSCache<NSString, PlatformImage>()
     private let queue = DispatchQueue(label: "com.pdfreader.thumbnailCache", qos: .userInitiated, attributes: .concurrent)
     
     init() {
@@ -33,11 +33,11 @@ final class ThumbnailCache {
         cache.totalCostLimit = 50 * 1024 * 1024  // 50MB limit
     }
     
-    func thumbnail(for key: String) -> NSImage? {
+    func thumbnail(for key: String) -> PlatformImage? {
         cache.object(forKey: key as NSString)
     }
     
-    func setThumbnail(_ image: NSImage, for key: String) {
+    func setThumbnail(_ image: PlatformImage, for key: String) {
         cache.setObject(image, forKey: key as NSString)
     }
     
@@ -357,7 +357,7 @@ struct ThumbnailItemView: View {
     let isBookmarked: Bool
     let documentName: String
     
-    @State private var thumbnail: NSImage?
+    @State private var thumbnail: PlatformImage?
     
     private var cacheKey: String {
         ThumbnailCache.shared.cacheKey(documentName: documentName, pageIndex: pageIndex)

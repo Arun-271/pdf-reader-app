@@ -79,7 +79,7 @@ struct CitationExtractorView: View {
                 .padding(8)
                 .background(
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(Color(NSColor.textBackgroundColor))
+                        .fill(Color.systemBackground)
                 )
             }
         }
@@ -348,7 +348,7 @@ struct CitationRow: View {
                         .padding(8)
                         .background(
                             RoundedRectangle(cornerRadius: 6)
-                                .fill(Color(NSColor.textBackgroundColor))
+                                .fill(Color.systemBackground)
                         )
                     
                     // Copy button
@@ -370,7 +370,7 @@ struct CitationRow: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(isHovered ? Color(NSColor.selectedContentBackgroundColor).opacity(0.3) : Color(NSColor.controlBackgroundColor))
+                .fill(isHovered ? Color.accentColor.opacity(0.3) : Color.secondarySystemBackground)
         )
         .onHover { isHovered = $0 }
     }

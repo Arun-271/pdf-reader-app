@@ -225,17 +225,45 @@ struct FocusModeView: View {
     }
     
     private func toggleFullScreen() {
+        #if os(macOS)
         if let window = NSApplication.shared.windows.first {
             window.toggleFullScreen(nil)
             isFullScreen.toggle()
         }
+        #endif
     }
 }
 
 // Simplified PDF View for focus mode
-struct FocusModePDFView: NSViewRepresentable {
+struct FocusModePDFView: PlatformViewRepresentable {
     @EnvironmentObject var documentManager: DocumentManager
     
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject {
+        var parent: FocusModePDFView
+        
+        init(_ parent: FocusModePDFView) {
+            self.parent = parent
+        }
+        
+        @objc func pageChanged(_ notification: Notification) {
+            if let pdfView = notification.object as? PDFView,
+               let page = pdfView.currentPage,
+               let document = pdfView.document {
+                let index = document.index(for: page)
+                DispatchQueue.main.async {
+                    if self.parent.documentManager.currentPageIndex != index {
+                        self.parent.documentManager.currentPageIndex = index
+                    }
+                }
+            }
+        }
+    }
+    
+    #if os(macOS)
     func makeNSView(context: Context) -> PDFView {
         let pdfView = PDFView()
         pdfView.autoScales = true
@@ -243,16 +271,41 @@ struct FocusModePDFView: NSViewRepresentable {
         pdfView.displayDirection = .horizontal
         pdfView.backgroundColor = .clear
         pdfView.displaysPageBreaks = false
+        NotificationCenter.default.addObserver(context.coordinator, selector: #selector(Coordinator.pageChanged(_:)), name: .PDFViewPageChanged, object: pdfView)
         return pdfView
     }
     
     func updateNSView(_ pdfView: PDFView, context: Context) {
+        updatePDFView(pdfView)
+    }
+    #else
+    func makeUIView(context: Context) -> PDFView {
+        let pdfView = PDFView()
+        pdfView.autoScales = true
+        pdfView.displayMode = .singlePage
+        pdfView.displayDirection = .horizontal
+        pdfView.backgroundColor = .clear
+        pdfView.displaysPageBreaks = false
+        NotificationCenter.default.addObserver(context.coordinator, selector: #selector(Coordinator.pageChanged(_:)), name: .PDFViewPageChanged, object: pdfView)
+        return pdfView
+    }
+    
+    func updateUIView(_ pdfView: PDFView, context: Context) {
+        updatePDFView(pdfView)
+    }
+    #endif
+    
+    private func updatePDFView(_ pdfView: PDFView) {
         if pdfView.document !== documentManager.pdfDocument {
             pdfView.document = documentManager.pdfDocument
         }
-        
-        // Go to current page
-        if let page = documentManager.pdfDocument?.page(at: documentManager.currentPageIndex) {
+        if let current = pdfView.currentPage, let doc = pdfView.document {
+            if doc.index(for: current) != documentManager.currentPageIndex {
+                if let page = doc.page(at: documentManager.currentPageIndex) {
+                    pdfView.go(to: page)
+                }
+            }
+        } else if let page = documentManager.pdfDocument?.page(at: documentManager.currentPageIndex) {
             pdfView.go(to: page)
         }
     }

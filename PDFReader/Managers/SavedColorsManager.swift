@@ -14,7 +14,7 @@ class SavedColorsManager: ObservableObject {
     private let key = "savedCustomHighlightColors"
     private let maxColors = 12
     
-    @Published var colors: [NSColor] = []
+    @Published var colors: [PlatformColor] = []
     
     private init() {
         loadColors()
@@ -22,7 +22,7 @@ class SavedColorsManager: ObservableObject {
     
     func loadColors() {
         guard let data = UserDefaults.standard.data(forKey: key),
-              let decoded = try? NSKeyedUnarchiver.unarchivedArrayOfObjects(ofClass: NSColor.self, from: data) else {
+              let decoded = try? NSKeyedUnarchiver.unarchivedArrayOfObjects(ofClass: PlatformColor.self, from: data) else {
             colors = []
             return
         }
@@ -36,7 +36,7 @@ class SavedColorsManager: ObservableObject {
         UserDefaults.standard.set(data, forKey: key)
     }
     
-    func addColor(_ color: NSColor) {
+    func addColor(_ color: PlatformColor) {
         // Check if similar color already exists
         if !colors.contains(where: { $0.isApproximatelyEqual(to: color) }) {
             colors.insert(color, at: 0)
@@ -47,7 +47,7 @@ class SavedColorsManager: ObservableObject {
         }
     }
     
-    func removeColor(_ color: NSColor) {
+    func removeColor(_ color: PlatformColor) {
         colors.removeAll { $0.isApproximatelyEqual(to: color) }
         saveColors()
     }
@@ -61,19 +61,19 @@ class SavedColorsManager: ObservableObject {
 
 // MARK: - Better Color Picker View
 struct ImprovedColorPickerSheet: View {
-    @Binding var selectedColor: NSColor
+    @Binding var selectedColor: PlatformColor
     @ObservedObject var savedColors = SavedColorsManager.shared
     @Environment(\.dismiss) private var dismiss
     @State private var pickedColor: Color
     
-    private let presetColors: [NSColor] = [
+    private let presetColors: [PlatformColor] = [
         .systemYellow, .systemGreen, .systemBlue,
         .systemPink, .systemOrange, .systemPurple,
         .systemRed, .systemTeal, .systemIndigo,
         .systemBrown, .systemMint, .systemCyan
     ]
     
-    init(selectedColor: Binding<NSColor>) {
+    init(selectedColor: Binding<PlatformColor>) {
         self._selectedColor = selectedColor
         self._pickedColor = State(initialValue: Color(selectedColor.wrappedValue))
     }
@@ -152,7 +152,7 @@ struct ImprovedColorPickerSheet: View {
                     .keyboardShortcut(.cancelAction)
                 
                 Button("Save & Apply") {
-                    let nsColor = NSColor(pickedColor)
+                    let nsColor = PlatformColor(pickedColor)
                     savedColors.addColor(nsColor)
                     selectedColor = nsColor
                     dismiss()
@@ -160,7 +160,7 @@ struct ImprovedColorPickerSheet: View {
                 .buttonStyle(.borderedProminent)
                 
                 Button("Apply") {
-                    selectedColor = NSColor(pickedColor)
+                    selectedColor = PlatformColor(pickedColor)
                     dismiss()
                 }
                 .keyboardShortcut(.defaultAction)
@@ -172,7 +172,7 @@ struct ImprovedColorPickerSheet: View {
 }
 
 struct ColorSwatchButton: View {
-    let color: NSColor
+    let color: PlatformColor
     let isSelected: Bool
     let action: () -> Void
     @State private var isHovered = false

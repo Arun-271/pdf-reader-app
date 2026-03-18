@@ -104,7 +104,7 @@ struct WebSearchView: View {
                         }
                     }
                     .padding(6)
-                    .background(Color(NSColor.textBackgroundColor))
+                    .background(Color.systemBackground)
                     .cornerRadius(6)
                     
                     Button("Search") {
@@ -122,7 +122,7 @@ struct WebSearchView: View {
                 .disabled(documentManager.pdfView?.currentSelection == nil)
             }
             .padding(12)
-            .background(Color(NSColor.controlBackgroundColor))
+            .background(Color.secondarySystemBackground)
             
             Divider()
             

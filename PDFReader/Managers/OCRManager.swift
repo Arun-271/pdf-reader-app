@@ -127,7 +127,7 @@ class OCRManager: ObservableObject {
             bitmapInfo: bitmapInfo
         ) else { return nil }
         
-        context.setFillColor(NSColor.white.cgColor)
+        context.setFillColor(PlatformColor.white.cgColor)
         context.fill(CGRect(x: 0, y: 0, width: width, height: height))
         
         context.scaleBy(x: scale, y: scale)

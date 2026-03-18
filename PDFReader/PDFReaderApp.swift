@@ -269,7 +269,7 @@ struct PDFReaderApp: App {
                 window.titlebarAppearsTransparent = true
                 window.titleVisibility = .hidden
                 window.styleMask.insert(.fullSizeContentView)
-                window.backgroundColor = NSColor.windowBackgroundColor
+                window.backgroundColor = PlatformColor.windowBackgroundColor
             }
         }
     }

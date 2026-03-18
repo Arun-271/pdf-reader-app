@@ -153,3 +153,35 @@ struct AdaptiveStack<Content: View>: View {
         }
     }
 }
+
+// MARK: - Color Swatch Images
+extension PlatformImage {
+    static func colorSwatch(_ color: PlatformColor, size: CGFloat = 16) -> PlatformImage {
+        #if os(macOS)
+        let image = NSImage(size: NSSize(width: size, height: size))
+        image.lockFocus()
+        color.setFill()
+        NSBezierPath(ovalIn: NSRect(x: 2, y: 2, width: size - 4, height: size - 4)).fill()
+        image.unlockFocus()
+        image.isTemplate = false
+        return image
+        #else
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: size, height: size))
+        let image = renderer.image { context in
+            color.setFill()
+            context.cgContext.fillEllipse(in: CGRect(x: 2, y: 2, width: size - 4, height: size - 4))
+        }
+        return image.withRenderingMode(.alwaysOriginal)
+        #endif
+    }
+}
+
+extension Image {
+    static func swatch(color: PlatformColor) -> Image {
+        #if os(macOS)
+        return Image(nsImage: PlatformImage.colorSwatch(color))
+        #else
+        return Image(uiImage: PlatformImage.colorSwatch(color))
+        #endif
+    }
+}

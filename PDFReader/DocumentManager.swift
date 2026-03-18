@@ -24,13 +24,13 @@ enum RightPanelMode: String, CaseIterable {
     case timer = "Timer"
     case progress = "Progress"
     case cloud = "Cloud"
-    case googleDrive = "Drive"
 }
 
 class DocumentManager: ObservableObject {
     @Published var pdfDocument: PDFDocument?
     @Published var currentPageIndex: Int = 0
     @Published var scaleFactor: CGFloat = 1.0
+    @Published var showToolbar: Bool = true
     @Published var showSidebar: Bool = true
     @Published var showRightPanel: Bool = false
     @Published var showSearch: Bool = false
@@ -46,21 +46,32 @@ class DocumentManager: ObservableObject {
     
     // Highlighter mode
     @Published var highlighterEnabled: Bool = false
-    @Published var highlighterColor: NSColor = .systemYellow
+    @Published var highlighterColor: PlatformColor = .systemYellow
     
     // Focus mode
     @Published var showFocusMode: Bool = false
     
     // Note adding mode
     @Published var addNoteMode: Bool = false
-    @Published var noteColor: NSColor = .systemYellow
+    @Published var noteColor: PlatformColor = .systemYellow
     
     // Save state
     @Published var hasUnsavedChanges: Bool = false
     @Published var showSavePrompt: Bool = false
     @Published var autoSaveEnabled: Bool = false
+    @Published var annotationsUpdateId: UUID = UUID()
+    
+    private let displayModeKey = "PDFReaderDisplayMode"
     
     var pdfView: PDFView?
+    
+    init() {
+        if let rawValue = UserDefaults.standard.string(forKey: displayModeKey),
+           let rawInt = Int(rawValue),
+           let mode = PDFDisplayMode(rawValue: rawInt) {
+            self.displayMode = mode
+        }
+    }
     
     var pageCount: Int {
         pdfDocument?.pageCount ?? 0
@@ -72,6 +83,7 @@ class DocumentManager: ObservableObject {
     }
     
     func openDocument() {
+        #if os(macOS)
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.pdf]
         panel.allowsMultipleSelection = false
@@ -83,6 +95,7 @@ class DocumentManager: ObservableObject {
         if panel.runModal() == .OK, let url = panel.url {
             loadDocument(from: url)
         }
+        #endif
     }
     
     func loadDocument(from url: URL) {
@@ -95,11 +108,6 @@ class DocumentManager: ObservableObject {
             self.searchResults = []
             self.searchText = ""
             self.hasUnsavedChanges = false
-            
-            // Set continuous scroll mode
-            if continuousScroll {
-                displayMode = .singlePageContinuous
-            }
             
             setupAnnotationObservers()
         }
@@ -122,6 +130,7 @@ class DocumentManager: ObservableObject {
         if !hasUnsavedChanges {
             hasUnsavedChanges = true
         }
+        annotationsUpdateId = UUID()
         if autoSaveEnabled {
             saveDocument()
         }
@@ -134,6 +143,7 @@ class DocumentManager: ObservableObject {
     }
 
     func saveDocumentAs() {
+        #if os(macOS)
         guard let document = pdfDocument else { return }
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.pdf]
@@ -144,6 +154,7 @@ class DocumentManager: ObservableObject {
             fileName = url.lastPathComponent
             hasUnsavedChanges = false
         }
+        #endif
     }
 
     func closeDocumentRequested() {
@@ -178,6 +189,7 @@ class DocumentManager: ObservableObject {
     }
     
     func printDocument() {
+        #if os(macOS)
         guard let pdfView = pdfView, let document = pdfDocument else { return }
         
         let printInfo = NSPrintInfo.shared
@@ -189,6 +201,7 @@ class DocumentManager: ObservableObject {
             printOperation.showsProgressPanel = true
             printOperation.run()
         }
+        #endif
     }
     
     func goToPage(_ index: Int) {
@@ -261,12 +274,20 @@ class DocumentManager: ObservableObject {
         searchResults = []
         currentSearchIndex = 0
         
-        // Find all occurrences - findString returns [PDFSelection]
-        searchResults = document.findString(searchText, withOptions: .caseInsensitive)
-        
-        // Highlight first result
-        if let firstResult = searchResults.first {
-            highlightSelection(firstResult)
+        let query = searchText
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            // Find all occurrences - findString returns [PDFSelection]
+            let results = document.findString(query, withOptions: .caseInsensitive)
+            
+            DispatchQueue.main.async {
+                guard let self = self, self.searchText == query else { return }
+                self.searchResults = results
+                
+                // Highlight first result
+                if let firstResult = self.searchResults.first {
+                    self.highlightSelection(firstResult)
+                }
+            }
         }
     }
     
@@ -302,6 +323,7 @@ class DocumentManager: ObservableObject {
     
     func setDisplayMode(_ mode: PDFDisplayMode) {
         displayMode = mode
+        UserDefaults.standard.set(String(mode.rawValue), forKey: displayModeKey)
         pdfView?.displayMode = mode
     }
 }

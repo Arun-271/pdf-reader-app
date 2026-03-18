@@ -10,6 +10,7 @@ import PDFKit
 import ObjectiveC
 
 // Wrapper class to hold associated object
+#if os(macOS)
 private class AnnotationHolder {
     weak var annotation: PDFAnnotation?
     init(_ annotation: PDFAnnotation) {
@@ -26,12 +27,24 @@ class HighlightablePDFView: PDFView {
     private var selectionObserver: NSObjectProtocol?
     private var selectionToolbarTimer: Timer?
     private let selectionToolbar = SelectionToolbarController.shared
+    private var trackingArea: NSTrackingArea?
+    private var hoveredAnnotation: PDFAnnotation?
 
     deinit {
         selectionToolbarTimer?.invalidate()
         if let observer = selectionObserver {
             NotificationCenter.default.removeObserver(observer)
         }
+    }
+    
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        if let existing = trackingArea { removeTrackingArea(existing) }
+        
+        let options: NSTrackingArea.Options = [.mouseMoved, .activeInActiveApp, .inVisibleRect]
+        trackingArea = NSTrackingArea(rect: bounds, options: options, owner: self, userInfo: nil)
+        
+        if let area = trackingArea { addTrackingArea(area) }
     }
 
     func setupSelectionObserver() {
@@ -75,6 +88,50 @@ class HighlightablePDFView: PDFView {
         // Hide floating toolbar when right-clicking
         selectionToolbar.hide()
         super.rightMouseDown(with: event)
+    }
+    
+    override func mouseMoved(with event: NSEvent) {
+        super.mouseMoved(with: event)
+        
+        // Do not intercept if actively selecting text
+        guard currentSelection == nil || currentSelection?.string?.isEmpty == true else { return }
+        guard let documentManager = documentManager else { return }
+        
+        let locationInView = convert(event.locationInWindow, from: nil)
+        
+        guard let clickedPage = page(for: locationInView, nearest: false) else {
+            if hoveredAnnotation != nil {
+                hoveredAnnotation = nil
+                selectionToolbar.hide()
+            }
+            return
+        }
+        
+        let locationInPage = convert(locationInView, to: clickedPage)
+        let validTypes = ["Highlight", "Underline", "StrikeOut", "Text", "FreeText"]
+        
+        if let annotation = clickedPage.annotations.first(where: {
+            validTypes.contains($0.type ?? "") && $0.bounds.contains(locationInPage)
+        }) {
+            if hoveredAnnotation != annotation {
+                hoveredAnnotation = annotation
+                selectionToolbar.showForAnnotation(annotation, in: self, documentManager: documentManager)
+            }
+        } else {
+            if hoveredAnnotation != nil && selectionToolbar.isVisible {
+                // Determine if mouse is over the toolbar window itself
+                let mouseLocation = NSEvent.mouseLocation
+                if let toolbarWindow = NSApplication.shared.windows.first(where: { $0.level == .floating && $0.title.isEmpty && $0.frame.width == 350 }) {
+                    if !toolbarWindow.frame.contains(mouseLocation) {
+                        hoveredAnnotation = nil
+                        selectionToolbar.hide()
+                    }
+                } else {
+                    hoveredAnnotation = nil
+                    selectionToolbar.hide()
+                }
+            }
+        }
     }
     
     override func mouseDown(with event: NSEvent) {
@@ -141,21 +198,21 @@ class HighlightablePDFView: PDFView {
         popover.show(relativeTo: rect, of: self, preferredEdge: .maxY)
     }
     
-    private func makeColorSwatchImage(color: NSColor, size: CGFloat = 16) -> NSImage {
-        let image = NSImage(size: NSSize(width: size, height: size))
+    private func makeColorSwatchImage(color: PlatformColor, size: CGFloat = 16) -> PlatformImage {
+        let image = PlatformImage(size: NSSize(width: size, height: size))
         image.lockFocus()
         color.setFill()
         let path = NSBezierPath(roundedRect: NSRect(x: 1, y: 1, width: size - 2, height: size - 2), xRadius: 3, yRadius: 3)
         path.fill()
-        NSColor.separatorColor.setStroke()
+        PlatformColor.separatorColor.setStroke()
         path.lineWidth = 0.5
         path.stroke()
         image.unlockFocus()
         return image
     }
 
-    private var allHighlightColors: [(String, NSColor)] {
-        var colors: [(String, NSColor)] = [
+    private var allHighlightColors: [(String, PlatformColor)] {
+        var colors: [(String, PlatformColor)] = [
             ("Yellow", .systemYellow),
             ("Green", .systemGreen),
             ("Blue", .systemBlue),
@@ -199,7 +256,7 @@ class HighlightablePDFView: PDFView {
             // Change color submenu for highlight/underline/strikeout
             if ["Highlight", "Underline", "StrikeOut"].contains(annotation.type ?? "") {
                 let changeColorItem = NSMenuItem(title: "Change Color", action: nil, keyEquivalent: "")
-                changeColorItem.image = NSImage(systemSymbolName: "paintpalette", accessibilityDescription: "Change Color")
+                changeColorItem.image = PlatformImage(systemSymbolName: "paintpalette", accessibilityDescription: "Change Color")
                 let colorMenu = NSMenu()
 
                 for (name, color) in allHighlightColors {
@@ -214,7 +271,7 @@ class HighlightablePDFView: PDFView {
                 let customItem = NSMenuItem(title: "Custom Color...", action: #selector(changeAnnotationCustomColor(_:)), keyEquivalent: "")
                 customItem.target = self
                 customItem.representedObject = annotation
-                customItem.image = NSImage(systemSymbolName: "plus.circle", accessibilityDescription: "Custom")
+                customItem.image = PlatformImage(systemSymbolName: "plus.circle", accessibilityDescription: "Custom")
                 colorMenu.addItem(customItem)
 
                 changeColorItem.submenu = colorMenu
@@ -224,7 +281,7 @@ class HighlightablePDFView: PDFView {
             let deleteItem = NSMenuItem(title: "Delete \(typeLabel)", action: #selector(deleteAnnotationFromMenu(_:)), keyEquivalent: "")
             deleteItem.target = self
             deleteItem.representedObject = annotation
-            deleteItem.image = NSImage(systemSymbolName: "trash", accessibilityDescription: "Delete")
+            deleteItem.image = PlatformImage(systemSymbolName: "trash", accessibilityDescription: "Delete")
             menu.addItem(deleteItem)
             menu.addItem(NSMenuItem.separator())
         }
@@ -233,7 +290,7 @@ class HighlightablePDFView: PDFView {
         if let selection = currentSelection, let selectionString = selection.string, !selectionString.isEmpty {
             // Highlight submenu with color swatches
             let highlightItem = NSMenuItem(title: "Highlight", action: nil, keyEquivalent: "")
-            highlightItem.image = NSImage(systemSymbolName: "highlighter", accessibilityDescription: "Highlight")
+            highlightItem.image = PlatformImage(systemSymbolName: "highlighter", accessibilityDescription: "Highlight")
             let highlightMenu = NSMenu()
 
             for (name, color) in allHighlightColors {
@@ -247,7 +304,7 @@ class HighlightablePDFView: PDFView {
             highlightMenu.addItem(NSMenuItem.separator())
             let customItem = NSMenuItem(title: "Custom Color...", action: #selector(highlightWithCustomColor(_:)), keyEquivalent: "")
             customItem.target = self
-            customItem.image = NSImage(systemSymbolName: "plus.circle", accessibilityDescription: "Custom")
+            customItem.image = PlatformImage(systemSymbolName: "plus.circle", accessibilityDescription: "Custom")
             highlightMenu.addItem(customItem)
 
             highlightItem.submenu = highlightMenu
@@ -266,13 +323,13 @@ class HighlightablePDFView: PDFView {
             // Underline
             let underlineItem = NSMenuItem(title: "Underline", action: #selector(underlineSelection(_:)), keyEquivalent: "")
             underlineItem.target = self
-            underlineItem.image = NSImage(systemSymbolName: "underline", accessibilityDescription: "Underline")
+            underlineItem.image = PlatformImage(systemSymbolName: "underline", accessibilityDescription: "Underline")
             menu.addItem(underlineItem)
 
             // Strikethrough
             let strikeItem = NSMenuItem(title: "Strikethrough", action: #selector(strikethroughSelection(_:)), keyEquivalent: "")
             strikeItem.target = self
-            strikeItem.image = NSImage(systemSymbolName: "strikethrough", accessibilityDescription: "Strikethrough")
+            strikeItem.image = PlatformImage(systemSymbolName: "strikethrough", accessibilityDescription: "Strikethrough")
             menu.addItem(strikeItem)
 
             menu.addItem(NSMenuItem.separator())
@@ -280,7 +337,7 @@ class HighlightablePDFView: PDFView {
             // Add Note
             let noteItem = NSMenuItem(title: "Add Note", action: #selector(addNoteToSelection(_:)), keyEquivalent: "")
             noteItem.target = self
-            noteItem.image = NSImage(systemSymbolName: "note.text.badge.plus", accessibilityDescription: "Add Note")
+            noteItem.image = PlatformImage(systemSymbolName: "note.text.badge.plus", accessibilityDescription: "Add Note")
             menu.addItem(noteItem)
 
             menu.addItem(NSMenuItem.separator())
@@ -293,7 +350,7 @@ class HighlightablePDFView: PDFView {
             // Summarize with AI
             let summarizeItem = NSMenuItem(title: "Summarize", action: #selector(summarizeSelection(_:)), keyEquivalent: "")
             summarizeItem.target = self
-            summarizeItem.image = NSImage(systemSymbolName: "sparkles", accessibilityDescription: "Summarize")
+            summarizeItem.image = PlatformImage(systemSymbolName: "sparkles", accessibilityDescription: "Summarize")
             menu.addItem(summarizeItem)
         }
 
@@ -315,7 +372,7 @@ class HighlightablePDFView: PDFView {
     @objc func changeAnnotationColor(_ sender: NSMenuItem) {
         guard let info = sender.representedObject as? [String: Any],
               let annotation = info["annotation"] as? PDFAnnotation,
-              let color = info["color"] as? NSColor else { return }
+              let color = info["color"] as? PlatformColor else { return }
         
         // Update annotation color
         if annotation.type == "Highlight" {
@@ -363,7 +420,7 @@ class HighlightablePDFView: PDFView {
     }
 
     @objc func highlightWithColor(_ sender: NSMenuItem) {
-        guard let color = sender.representedObject as? NSColor else { return }
+        guard let color = sender.representedObject as? PlatformColor else { return }
         addHighlightAnnotation(color: color)
     }
     
@@ -420,13 +477,13 @@ class HighlightablePDFView: PDFView {
         documentManager?.showRightPanel = true
     }
     
-    private func addHighlightAnnotation(color: NSColor) {
+    private func addHighlightAnnotation(color: PlatformColor) {
         // Save as last used color
         UserDefaults.standard.setColor(color, forKey: "lastHighlightColor")
         addAnnotation(type: .highlight, color: color.withAlphaComponent(0.5))
     }
     
-    private func addAnnotation(type: PDFAnnotationSubtype, color: NSColor) {
+    private func addAnnotation(type: PDFAnnotationSubtype, color: PlatformColor) {
         guard let selection = currentSelection else { return }
 
         let typeString: String
@@ -510,15 +567,15 @@ extension Notification.Name {
 
 // UserDefaults extension for color storage
 extension UserDefaults {
-    func setColor(_ color: NSColor, forKey key: String) {
+    func setColor(_ color: PlatformColor, forKey key: String) {
         if let data = try? NSKeyedArchiver.archivedData(withRootObject: color, requiringSecureCoding: false) {
             set(data, forKey: key)
         }
     }
     
-    func color(forKey key: String) -> NSColor? {
+    func color(forKey key: String) -> PlatformColor? {
         guard let data = data(forKey: key) else { return nil }
-        return try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSColor.self, from: data)
+        return try? NSKeyedUnarchiver.unarchivedObject(ofClass: PlatformColor.self, from: data)
     }
 }
 
@@ -532,7 +589,7 @@ struct PDFKitView: NSViewRepresentable {
         pdfView.autoScales = true
         pdfView.displayMode = .singlePageContinuous
         pdfView.displayDirection = .vertical
-        pdfView.backgroundColor = NSColor.windowBackgroundColor
+        pdfView.backgroundColor = PlatformColor.windowBackgroundColor
         pdfView.displaysPageBreaks = true
         pdfView.pageBreakMargins = NSEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         
@@ -588,6 +645,30 @@ struct PDFKitView: NSViewRepresentable {
         let isTwoUp = documentManager.displayMode == .twoUp || documentManager.displayMode == .twoUpContinuous
         if pdfView.displaysAsBook != isTwoUp {
             pdfView.displaysAsBook = isTwoUp
+        }
+        
+        // Minimize the gap between double pages
+        if isTwoUp {
+            #if os(macOS)
+            pdfView.pageBreakMargins = NSEdgeInsets(top: 10, left: 2, bottom: 10, right: 2)
+            #else
+            pdfView.pageBreakMargins = UIEdgeInsets(top: 10, left: 2, bottom: 10, right: 2)
+            #endif
+        } else {
+            #if os(macOS)
+            pdfView.pageBreakMargins = NSEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+            #else
+            pdfView.pageBreakMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+            #endif
+        }
+        
+        // Sync return to focus mode page
+        if let currentPage = pdfView.currentPage, let document = pdfView.document {
+            if document.index(for: currentPage) != documentManager.currentPageIndex {
+                if let newPage = document.page(at: documentManager.currentPageIndex) {
+                    pdfView.go(to: newPage)
+                }
+            }
         }
     }
     
@@ -659,7 +740,7 @@ struct NoteEditPopoverView: View {
                 .font(.system(size: 13))
                 .frame(height: 80)
                 .padding(6)
-                .background(Color(NSColor.textBackgroundColor))
+                .background(Color.systemBackground)
                 .cornerRadius(6)
                 .focused($isFocused)
             
@@ -690,3 +771,5 @@ struct NoteEditPopoverView: View {
         }
     }
 }
+
+#endif

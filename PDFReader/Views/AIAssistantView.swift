@@ -37,7 +37,7 @@ struct AIAssistantView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(Color(NSColor.controlBackgroundColor))
+            .background(Color.secondarySystemBackground)
             
             Divider()
             
@@ -187,7 +187,7 @@ struct MessageBubble: View {
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
                 Text(message.content)
                     .padding(10)
-                    .background(message.role == .user ? Color.accentColor : Color(NSColor.controlBackgroundColor))
+                    .background(message.role == .user ? Color.accentColor : Color.secondarySystemBackground)
                     .foregroundColor(message.role == .user ? .white : .primary)
                     .cornerRadius(12)
                 

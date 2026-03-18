@@ -99,7 +99,7 @@ struct CloudSyncView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(NSColor.controlBackgroundColor))
+                .fill(Color.secondarySystemBackground)
         )
     }
     
@@ -164,7 +164,7 @@ struct CloudSyncView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(NSColor.controlBackgroundColor))
+                .fill(Color.secondarySystemBackground)
         )
     }
     
@@ -211,7 +211,7 @@ struct CloudSyncView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(NSColor.controlBackgroundColor))
+                .fill(Color.secondarySystemBackground)
         )
     }
     

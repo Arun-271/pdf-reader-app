@@ -7,43 +7,57 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		001 /* PDFReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101; };
-		002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102; };
-		003 /* DocumentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103; };
-		004 /* PDFKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104; };
-		005 /* ThumbnailSidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105; };
-		006 /* ToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106; };
-		007 /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107; };
-		008 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108; };
-		009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 109; };
-		010 /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111; };
-		011 /* RecentDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112; };
-		012 /* AISettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113; };
-		013 /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114; };
-		014 /* RecentDocumentsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115; };
-		015 /* AIAssistantManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116; };
-		016 /* DictionaryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117; };
-		017 /* BookmarksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118; };
-		018 /* AnnotationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119; };
-		019 /* RecentDocumentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 120; };
-		020 /* AIAssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 121; };
-		021 /* DictionaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122; };
-		022 /* WebSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123; };
-		023 /* PDFReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 124; };
-		024 /* SavedColorsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 126; };
-		025 /* ReadingProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127; };
-		026 /* FocusTimerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128; };
-		027 /* CitationExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129; };
-		028 /* OCRManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130; };
-		029 /* CloudSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 131; };
-		030 /* FocusTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 132; };
-		031 /* ReadingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133; };
-		032 /* CitationExtractorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134; };
-		033 /* OCRView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135; };
-		034 /* FocusModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 136; };
-		035 /* CloudSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 137; };
-		036 /* SelectionToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138; };
+		001 /* PDFReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101 /* PDFReaderApp.swift */; };
+		002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102 /* ContentView.swift */; };
+		003 /* DocumentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103 /* DocumentManager.swift */; };
+		004 /* PDFKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104 /* PDFKitView.swift */; };
+		005 /* ThumbnailSidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105 /* ThumbnailSidebarView.swift */; };
+		006 /* ToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106 /* ToolbarView.swift */; };
+		007 /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107 /* SearchBarView.swift */; };
+		008 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108 /* SettingsView.swift */; };
+		009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 109 /* Assets.xcassets */; };
+		010 /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111 /* Bookmark.swift */; };
+		011 /* RecentDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112 /* RecentDocument.swift */; };
+		012 /* AISettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113 /* AISettings.swift */; };
+		013 /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114 /* BookmarkManager.swift */; };
+		014 /* RecentDocumentsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115 /* RecentDocumentsManager.swift */; };
+		015 /* AIAssistantManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116 /* AIAssistantManager.swift */; };
+		016 /* DictionaryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117 /* DictionaryManager.swift */; };
+		017 /* BookmarksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118 /* BookmarksView.swift */; };
+		018 /* AnnotationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119 /* AnnotationsView.swift */; };
+		019 /* RecentDocumentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 120 /* RecentDocumentsView.swift */; };
+		020 /* AIAssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 121 /* AIAssistantView.swift */; };
+		021 /* DictionaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122 /* DictionaryView.swift */; };
+		022 /* WebSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123 /* WebSearchView.swift */; };
+		023 /* PDFReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 124 /* PDFReaderTests.swift */; };
+		024 /* SavedColorsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 126 /* SavedColorsManager.swift */; };
+		025 /* ReadingProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127 /* ReadingProgressManager.swift */; };
+		026 /* FocusTimerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128 /* FocusTimerManager.swift */; };
+		027 /* CitationExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129 /* CitationExtractor.swift */; };
+		028 /* OCRManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130 /* OCRManager.swift */; };
+		029 /* CloudSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 131 /* CloudSyncManager.swift */; };
+		030 /* FocusTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 132 /* FocusTimerView.swift */; };
+		031 /* ReadingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133 /* ReadingProgressView.swift */; };
+		032 /* CitationExtractorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134 /* CitationExtractorView.swift */; };
+		033 /* OCRView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135 /* OCRView.swift */; };
+		034 /* FocusModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 136 /* FocusModeView.swift */; };
+		035 /* CloudSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 137 /* CloudSyncView.swift */; };
+		036 /* SelectionToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138 /* SelectionToolbarView.swift */; };
+		49AEF245597CBF44905951D3 /* PlatformAliases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B25C43EE8194B76FF7C8CA0 /* PlatformAliases.swift */; };
+		62383A1EB946F61FA4B737C8 /* SavedColorsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67B4FC8BCD4D4E53FDD87EF7 /* SavedColorsManagerTests.swift */; };
+		807829BB3F9D882B5BD376A4 /* PDFKitView_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = C755348D81E831A9AAE2DDFB /* PDFKitView_iOS.swift */; };
+		C10EDEEC637129B4F2337989 /* AIAssistantManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52147BA599D2463355E74E7 /* AIAssistantManagerTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		422 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 600 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 400;
+			remoteInfo = PDFReader;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		100 /* PDFReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PDFReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -85,6 +99,10 @@
 		136 /* FocusModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeView.swift; sourceTree = "<group>"; };
 		137 /* CloudSyncView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncView.swift; sourceTree = "<group>"; };
 		138 /* SelectionToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionToolbarView.swift; sourceTree = "<group>"; };
+		4B25C43EE8194B76FF7C8CA0 /* PlatformAliases.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PlatformAliases.swift; path = Shared/PlatformAliases.swift; sourceTree = "<group>"; };
+		67B4FC8BCD4D4E53FDD87EF7 /* SavedColorsManagerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SavedColorsManagerTests.swift; sourceTree = "<group>"; };
+		C755348D81E831A9AAE2DDFB /* PDFKitView_iOS.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PDFKitView_iOS.swift; path = iOS/PDFKitView_iOS.swift; sourceTree = "<group>"; };
+		D52147BA599D2463355E74E7 /* AIAssistantManagerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AIAssistantManagerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +148,8 @@
 				305 /* Views */,
 				109 /* Assets.xcassets */,
 				110 /* PDFReader.entitlements */,
+				CCA68D48159479356A2A5C1E /* Shared */,
+				CE37E0EF2094A5D6817C1654 /* iOS */,
 			);
 			path = PDFReader;
 			sourceTree = "<group>";
@@ -141,14 +161,6 @@
 				125 /* PDFReaderTests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		306 /* PDFReaderTests */ = {
-			isa = PBXGroup;
-			children = (
-				124 /* PDFReaderTests.swift */,
-			);
-			path = PDFReaderTests;
 			sourceTree = "<group>";
 		};
 		303 /* Models */ = {
@@ -198,12 +210,38 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		306 /* PDFReaderTests */ = {
+			isa = PBXGroup;
+			children = (
+				124 /* PDFReaderTests.swift */,
+				D52147BA599D2463355E74E7 /* AIAssistantManagerTests.swift */,
+				67B4FC8BCD4D4E53FDD87EF7 /* SavedColorsManagerTests.swift */,
+			);
+			path = PDFReaderTests;
+			sourceTree = "<group>";
+		};
+		CCA68D48159479356A2A5C1E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4B25C43EE8194B76FF7C8CA0 /* PlatformAliases.swift */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		CE37E0EF2094A5D6817C1654 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				C755348D81E831A9AAE2DDFB /* PDFKitView_iOS.swift */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
 		400 /* PDFReader */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 500;
+			buildConfigurationList = 500 /* Build configuration list for PBXNativeTarget "PDFReader" */;
 			buildPhases = (
 				401 /* Sources */,
 				200 /* Frameworks */,
@@ -220,7 +258,7 @@
 		};
 		410 /* PDFReaderTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 510;
+			buildConfigurationList = 510 /* Build configuration list for PBXNativeTarget "PDFReaderTests" */;
 			buildPhases = (
 				411 /* Sources */,
 				201 /* Frameworks */,
@@ -237,24 +275,6 @@
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
-
-/* Begin PBXTargetDependency section */
-		421 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 400 /* PDFReader */;
-			targetProxy = 422 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
-/* Begin PBXContainerItemProxy section */
-		422 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 600 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 400;
-			remoteInfo = PDFReader;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXProject section */
 		600 /* Project object */ = {
@@ -273,7 +293,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 601;
+			buildConfigurationList = 601 /* Build configuration list for PBXProject "PDFReader" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -349,6 +369,8 @@
 				034 /* FocusModeView.swift in Sources */,
 				035 /* CloudSyncView.swift in Sources */,
 				036 /* SelectionToolbarView.swift in Sources */,
+				49AEF245597CBF44905951D3 /* PlatformAliases.swift in Sources */,
+				807829BB3F9D882B5BD376A4 /* PDFKitView_iOS.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -357,10 +379,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				023 /* PDFReaderTests.swift in Sources */,
+				C10EDEEC637129B4F2337989 /* AIAssistantManagerTests.swift in Sources */,
+				62383A1EB946F61FA4B737C8 /* SavedColorsManagerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		421 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 400 /* PDFReader */;
+			targetProxy = 422 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		700 /* Debug */ = {
@@ -487,23 +519,26 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = PDFReader/PDFReader.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 2ZG3R23JZB;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PDFReader/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "PDF Reader";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Arun J. All rights reserved.";
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0-alpha;
-				PRODUCT_BUNDLE_IDENTIFIER = com.pdfreader.app;
+				MARKETING_VERSION = "0.1.0-alpha";
+				PRODUCT_BUNDLE_IDENTIFIER = com.arunjeyamari.tech;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -516,23 +551,26 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = PDFReader/PDFReader.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 2ZG3R23JZB;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PDFReader/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "PDF Reader";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Arun J. All rights reserved.";
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0-alpha;
-				PRODUCT_BUNDLE_IDENTIFIER = com.pdfreader.app;
+				MARKETING_VERSION = "0.1.0-alpha";
+				PRODUCT_BUNDLE_IDENTIFIER = com.arunjeyamari.tech;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -547,8 +585,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.1.0-alpha;
-				PRODUCT_BUNDLE_IDENTIFIER = com.pdfreader.app.tests;
+				MARKETING_VERSION = "0.1.0-alpha";
+				PRODUCT_BUNDLE_IDENTIFIER = com.arunjeyamari.tech.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -564,8 +602,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.1.0-alpha;
-				PRODUCT_BUNDLE_IDENTIFIER = com.pdfreader.app.tests;
+				MARKETING_VERSION = "0.1.0-alpha";
+				PRODUCT_BUNDLE_IDENTIFIER = com.arunjeyamari.tech.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -585,20 +623,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		601 /* Build configuration list for PBXProject "PDFReader" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				700 /* Debug */,
-				701 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		510 /* Build configuration list for PBXNativeTarget "PDFReaderTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				710 /* Debug */,
 				711 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		601 /* Build configuration list for PBXProject "PDFReader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				700 /* Debug */,
+				701 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
