@@ -130,6 +130,20 @@ PDFReader/
 4. Go to Settings > AI
 5. Select "Ollama" as provider
 
+### Features to ADD
+1. When closing document if changes are there prompt for saving the file.
+2. Toggle to enable Autosave in toolbar.
+3. Google Drive Sync.
+4. In double page view gap is high between each pages.
+
+### Issue Fixes:
+1. Fix issue in the double press next button in two pages view.
+2. Highlight option is so convoluted.
+    The toolbar still highlight not shows the color correctly.
+    Custom color not working.
+    When highligting hover option only works then the purpose of highlight option in toolbar not makes sense.
+3. Hoverbar AI button should paste the highlighted text in the chat window.
+
 ## License
 
 MIT License - Feel free to use and modify as needed.
